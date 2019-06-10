@@ -63,6 +63,7 @@ namespace Microsoft.PackageManagement.NuGetProvider
         private bool? _isCalledFromPowerShellGet;
         private string _CredentialUsername;
         private SecureString _CredentialPassword;
+        internal bool suppressCredProvider = false;
 
         public HttpClient SetHttpClient (HttpClient client)
         {
@@ -1934,9 +1935,13 @@ namespace Microsoft.PackageManagement.NuGetProvider
         internal NetworkCredential GetCredsFromCredProvider(string query, NuGetRequest request, bool isRetry=false)
         {
             request.Debug("Calling 'GetCredsFromCredProvider' on {0}", query);
-            if (query.IsNullOrEmpty())
+            // https://pkgs.dev.azure.com/<reponame>/v2/ for v2 integration
+            Match test = Regex.Match(query, @"(\S*pkgs.dev.azure.com\S*/v2)");
+            string queryBase = test.ToString();
+            if (queryBase.IsNullOrEmpty())
             {
                 request.Debug("Query is null.");
+                return null;
             }
 
             var osPlatform = Environment.OSVersion.Platform;
@@ -2032,7 +2037,7 @@ namespace Microsoft.PackageManagement.NuGetProvider
             // See: https://github.com/Microsoft/artifacts-credprovider
             Process proc = new Process();
             var filename = credProviderPath;
-            var arguments = "-V verbose -U " + query;
+            var arguments = "-V verbose -U " + queryBase;
             if (callDotnet)
             {
                 filename = "dotnet";

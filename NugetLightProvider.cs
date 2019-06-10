@@ -176,6 +176,7 @@ namespace Microsoft.PackageManagement.NuGetProvider
 
             request.Debug(Resources.Messages.DebugInfoCallMethod, PackageProviderName, "ResolvePackageSources");
 
+            request.suppressCredProvider = true;
             var selectedSources = request.SelectedSources;
 
             try

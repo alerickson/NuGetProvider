@@ -106,7 +106,7 @@ namespace Microsoft.PackageManagement.NuGetProvider
                 }
                 else 
                 {
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    if (response.StatusCode == HttpStatusCode.Unauthorized && !request.suppressCredProvider)
                     {
                         // If the uri is not validated, try again using credentials retrieved from credential provider
                         // First call to the credential provider is to get credentials, but if those credentials fail,
